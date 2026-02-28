@@ -9,22 +9,19 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build on Remote Docker Server') {
             steps {
-                sh 'docker build -t tomcat-app .'
-            }
-        }
-
-        stage('Stop Old Container') {
-            steps {
-                sh 'docker stop tomcat-container || true'
-                sh 'docker rm tomcat-container || true'
-            }
-        }
-
-        stage('Run Container') {
-            steps {
-                sh 'docker run -d -p 9090:8080 --name tomcat-container tomcat-app'
+                sh '''
+                ssh munna@192.168.0.113 "rm -rf /home/munna/tomcat-build"
+                scp -r * munna@192.168.0.113:/home/munna/tomcat-build
+                ssh munna@192.168.0.113 "
+                    cd /home/munna/tomcat-build &&
+                    docker build -t tomcat-app . &&
+                    docker stop tomcat-container || true &&
+                    docker rm tomcat-container || true &&
+                    docker run -d -p 9090:8080 --name tomcat-container tomcat-app
+                "
+                '''
             }
         }
     }
