@@ -19,7 +19,7 @@ pipeline {
                     docker build -t tomcat-app . &&
                     docker stop tomcat-container || true &&
                     docker rm tomcat-container || true &&
-                    docker run -d -p 9090:8080 --name tomcat-container tomcat-app
+                    docker run -d -p 9191:8080 --name tomcat-container tomcat-app
                 "
                 '''
             }
